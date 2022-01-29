@@ -1,0 +1,145 @@
+﻿@model AssignmentDNTSignup.Models.Signup
+
+@{
+    ViewData["Title"] = "Signup";
+}
+
+<h1>Signup</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Signup" asp-controller="Signup" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Username" class="control-label"></label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Contact" class="control-label"></label>
+                <input asp-for="Contact" class="form-control" />
+                <span asp-validation-for="Contact" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country" class="control-label"></label>
+                @*<input asp-for="Country" class="form-control" />*@
+                <select asp-for="Country" asp-items="@(new SelectList(@ViewBag.Countries,"Id","CountryName"))" class="form-control" onchange="test(this.value)"></select> 
+                
+                <span asp-validation-for="Country" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City" class="control-label"></label>
+                @*<input asp-for="City" class="form-control" />*@
+                <select id="ddlcity" name="ddlcity" class="form-control" asp-for="City"></select>
+                @*  <select asp-for="City" asp-items="@(new SelectList(@ViewBag.City,"StateId","CityName"))" class="form-control"></select> *@
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+             
+                 <label asp-for="Gender" class="control-label"></label>
+                  </div>
+
+             <div class="form-group">
+               @*  <label class="control-label">Male</label>
+                     <input type="radio" value="Male" asp-for="Gender" checked />
+                     <label class="control-label">Female</label>
+                      <input type="radio" asp-for="Gender" value="Female" />
+                       @*<input type="radio" name="MyRadioField" value="option3" />*@
+                     
+                        @{    
+                           foreach(Signup.genderlist gender in Enum.GetValues(typeof(Signup.genderlist)))
+                            {
+                                <label>
+                                 <input class="form-check-input" asp-for="Gender" Type="radio" value="@gender"/> @gender 
+                                </label>
+                            }
+                         }
+                      
+
+                   
+
+            
+               </div>
+           
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Terms" Type ="checkbox" />
+                     <span asp-validation-for="Terms" class="text-danger"></span>@*@Html.DisplayNameFor(model => model.Terms)*@
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+   
+    <partial name="_ValidationScriptsPartial" />
+
+
+    <script>
+  jQuery.validator.unobtrusive.adapters.add("checkbox", function (options) {
+         if (options.element.tagName.toUpperCase() == "INPUT" && options.element.type.toUpperCase() == "CHECKBOX") {
+                 options.rules["required"] = true;
+                 if (options.message) {
+                     options.messages["required"] = options.message;
+                 }
+         }
+     });
+     function test(_stateId) {
+         var ddlcity = $("#ddlcity");
+           alert('hi');
+          //var procemessage = "<option value='0'> Please wait...</option>";
+       // $("#ddlcity").html(procemessage).show();
+        ddlcity.empty().append('<option selected="selected" value="0" disabled = "disabled">Please wait...</option>');
+        var url = "/Signup/GetCityByStateId/";
+       
+        
+
+        $.ajax({
+             type: "POST",
+                contentType: 'application/x-www-form-urlencoded',
+            url: url,
+            data: { 'stateid': _stateId },
+            dataType: "json",
+            success: function (response) {
+               ddlcity.empty().append('<option selected="selected" value="0">Please select</option>');
+                    $.each(response, function () {
+                      alert(JSON.stringify(response))
+                        ddlcity.append($("<option></option>").val(this['value']).html(this['text']));
+                    });
+               // var markup = "<option value='0'>Select City</option>";
+            
+                ////for (var x = 0; x < data1.length; x++) {
+                ////  //  alert(data[x].Value);
+                ////    alert(data1[x].Text);
+                ////    //alert(markup);
+                ////    markup += "<option value=" + data1[x].Value + ">" + data1[x].Text + "</option>";
+                ////}
+               /// $("#ddlcity").html(markup).show();
+            },
+            error: function (response) {
+                alert("error : " + response);
+            }
+        });
+
+        }
+
+    </script>
+    
+}
